@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsIn, IsNotEmpty, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import { Branch } from 'src/constant/enum/branch.enum';
 import { Role } from 'src/constant/enum/role.enum';
 
 export class CreateUserDto {
@@ -21,12 +22,12 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'The email is required' })
     email: string;
 
-    @IsIn([Role.ADMIN, Role.USER], { message: 'Role must be either admin or user or manager' })
+    @IsIn([Role.ADMIN, Role.MANAGER, Role.STAFF, undefined], { message: 'Role must be either admin, staff or manager' })
     role: string;
+
+    @IsIn([Branch.DN, Branch.HN1, Branch.HN2, undefined], { message: 'Invalid branch' })
     branch: string;
 
     isActive: boolean;
-    createAt: Date;
-    updateAt: Date;
     manageId: number;
 }

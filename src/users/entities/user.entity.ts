@@ -16,10 +16,10 @@ export class User {
     @Column({ nullable: false })
     password: string;
 
-    @Column({ nullable: false, type: 'enum', enum: Role, default: Role.USER })
+    @Column({ nullable: true, type: 'enum', enum: Role })
     role: string;
 
-    @Column({ nullable: false, type: 'enum', enum: Branch, default: Branch.HN1 })
+    @Column({ nullable: true, type: 'enum', enum: Branch })
     branch: string;
 
     @Column({ nullable: false, default: true })

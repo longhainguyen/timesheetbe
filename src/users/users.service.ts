@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateRoleUserDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,13 @@ export class UsersService {
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
-        const newUser = this.usersRepository.create(createUserDto);
+        const { password, ...rest } = createUserDto;
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = this.usersRepository.create({
+            ...rest,
+            password: hashedPassword,
+        });
         try {
             return await this.usersRepository.save(newUser);
         } catch (error) {
@@ -26,6 +33,10 @@ export class UsersService {
 
     async findAll(): Promise<User[]> {
         return this.usersRepository.find();
+    }
+
+    async findAllByRole(role: string): Promise<User[]> {
+        return this.usersRepository.find({ where: { role } });
     }
 
     async findOneByID(id: number): Promise<User> {
@@ -58,5 +69,14 @@ export class UsersService {
         if (result.affected === 0) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
+    }
+
+    async assignRole(id: number, updateRoleUserDto: UpdateRoleUserDto): Promise<User> {
+        await this.usersRepository.update(id, updateRoleUserDto);
+        const updatedUser = await this.usersRepository.findOne({ where: { id } });
+        if (!updatedUser) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        return updatedUser;
     }
 }
