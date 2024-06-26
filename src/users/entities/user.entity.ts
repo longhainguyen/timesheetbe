@@ -1,6 +1,17 @@
+import { Exclude } from 'class-transformer';
 import { Branch } from 'src/constant/enum/branch.enum';
 import { Role } from 'src/constant/enum/role.enum';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { UserProject } from 'src/user-project/entities/user-project.entity';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    ManyToMany,
+    JoinTable,
+    OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -13,6 +24,7 @@ export class User {
     @Column({ nullable: false, unique: true })
     email: string;
 
+    @Exclude()
     @Column({ nullable: false })
     password: string;
 
@@ -31,6 +43,6 @@ export class User {
     @UpdateDateColumn({ nullable: false, type: 'timestamp' })
     updateAt: Date;
 
-    @Column({ type: 'int', nullable: true })
-    manageId: number;
+    @OneToMany(() => UserProject, (userProject) => userProject.user)
+    userProject: UserProject[];
 }

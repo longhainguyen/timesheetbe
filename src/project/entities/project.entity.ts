@@ -1,4 +1,15 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserProject } from 'src/user-project/entities/user-project.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Project {
@@ -19,4 +30,7 @@ export class Project {
 
     @UpdateDateColumn({ type: 'timestamp', nullable: false })
     updateAt: Date;
+
+    @OneToMany(() => UserProject, (userProject) => userProject.project)
+    userProject: UserProject[];
 }

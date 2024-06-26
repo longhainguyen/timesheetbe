@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
+import { UserProjectModule } from './user-project/user-project.module';
 
 @Module({
     imports: [
@@ -25,9 +26,11 @@ import { ProjectModule } from './project/project.module';
             database: process.env.DATABASE_NAME,
             entities: [join(process.cwd(), 'dist/**/*.entity.js')],
             synchronize: true,
+            autoLoadEntities: true,
         }),
         AuthModule,
         ProjectModule,
+        UserProjectModule,
     ],
     controllers: [AppController],
     providers: [AppService],

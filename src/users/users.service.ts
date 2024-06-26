@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +23,10 @@ export class UsersService {
             password: hashedPassword,
         });
         try {
-            return await this.usersRepository.save(newUser);
+            const savedUser = await this.usersRepository.save(newUser);
+            // const { password, ...userWithoutPassword } = savedUser;
+            // return userWithoutPassword;
+            return plainToClass(User, savedUser);
         } catch (error) {
             if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
                 throw new HttpException('User with this username or email already exists', HttpStatus.CONFLICT);
@@ -39,7 +43,7 @@ export class UsersService {
         return this.usersRepository.find({ where: { role } });
     }
 
-    async findOneByID(id: number): Promise<User> {
+    async findOneByID(id: number): Promise<Omit<User, 'password'>> {
         const user = await this.usersRepository.findOne({ where: { id } });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
