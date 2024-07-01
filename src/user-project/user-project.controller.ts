@@ -5,7 +5,10 @@ import { UserProject } from './entities/user-project.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/users/roles.guard';
 import { Role } from 'src/constant/enum/role.enum';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('project')
+@ApiBearerAuth('JWT-auth')
 @Controller('user-project')
 export class UserProjectController {
     constructor(private readonly userProjectService: UserProjectService) {}

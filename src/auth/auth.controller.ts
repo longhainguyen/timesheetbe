@@ -3,7 +3,10 @@ import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in-dto';
 import { AuthGuard } from './auth.guard';
 import { Public } from 'src/decorators/public.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
+@ApiBearerAuth('JWT-auth')
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}

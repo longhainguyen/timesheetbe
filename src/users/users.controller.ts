@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    ParseIntPipe,
+    UseGuards,
+    UseInterceptors,
+    ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateRoleUserDto, UpdateUserDto } from './dto/update-user.dto';
@@ -9,14 +21,21 @@ import { RoleValidationPipe } from 'src/pipe/role-validation.pipe';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from './roles.guard';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
+import { ApiBasicAuth, ApiBearerAuth, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiBearerAuth('JWT-auth')
+@ApiTags('users')
+@UseInterceptors(LoggingInterceptor)
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     // @Public()
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
+    @ApiQuery({ name: 'role', enum: Role })
     @Post()
     create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);
@@ -33,6 +52,8 @@ export class UsersController {
     @Roles(Role.ADMIN)
     @Get()
     findAll() {
+        console.log('Second');
+
         return this.usersService.findAll();
     }
 
