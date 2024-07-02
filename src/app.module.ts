@@ -9,6 +9,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { UserProjectModule } from './user-project/user-project.module';
+import { dataSourceOptions } from 'db/data-source';
 
 @Module({
     imports: [
@@ -17,17 +18,7 @@ import { UserProjectModule } from './user-project/user-project.module';
             isGlobal: true,
             load: [configuration],
         }),
-        TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: process.env.DATABASE_HOST,
-            port: +process.env.DATABASE_PORT,
-            username: process.env.DATABASE_USER,
-            password: process.env.DATABASE_PASSWORD,
-            database: process.env.DATABASE_NAME,
-            entities: [join(process.cwd(), 'dist/**/*.entity.js')],
-            synchronize: true,
-            autoLoadEntities: true,
-        }),
+        TypeOrmModule.forRoot(dataSourceOptions),
         AuthModule,
         ProjectModule,
         UserProjectModule,

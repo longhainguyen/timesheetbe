@@ -15,10 +15,10 @@ async function bootstrap() {
     );
 
     const config = new DocumentBuilder()
-        .setTitle('Cats example')
-        .setDescription('The cats API description')
+        .setTitle('Time sheet')
+        .setDescription('The Time sheet API description')
         .setVersion('1.0')
-        .addTag('cats')
+        .addTag('timesheet')
         .addBearerAuth(
             {
                 type: 'http',
