@@ -1,13 +1,27 @@
-import { IsBoolean, IsEmail, IsIn, IsNotEmpty, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsBoolean,
+    IsEmail,
+    IsIn,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    Length,
+    Matches,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
 import { Branch } from 'src/constant/enum/branch.enum';
 import { Role } from 'src/constant/enum/role.enum';
 
 export class CreateUserDto {
+    @ApiProperty()
     @IsNotEmpty({ message: 'The userName is required' })
     @Length(3, 255)
     @IsString()
     userName: string;
 
+    @ApiProperty()
     @IsNotEmpty({ message: 'The password is required' })
     @IsString()
     // @MinLength(8)
@@ -18,13 +32,16 @@ export class CreateUserDto {
     // })
     password: string;
 
+    @ApiProperty()
     @IsEmail()
     @IsNotEmpty({ message: 'The email is required' })
     email: string;
 
+    @ApiProperty()
     @IsIn([Role.ADMIN, Role.MANAGER, Role.STAFF, undefined], { message: 'Role must be either admin, staff or manager' })
     role: string;
 
+    @ApiProperty()
     @IsIn([Branch.DN, Branch.HN1, Branch.HN2, undefined], { message: 'Invalid branch' })
     branch: string;
 

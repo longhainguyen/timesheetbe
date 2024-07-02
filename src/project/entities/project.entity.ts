@@ -1,9 +1,12 @@
+import { Task } from 'src/task/entities/task.entity';
+import { Timesheet } from 'src/timesheet/entities/timesheet.entity';
 import { UserProject } from 'src/user-project/entities/user-project.entity';
 import {
     Column,
     CreateDateColumn,
     Entity,
     JoinColumn,
+    JoinTable,
     ManyToMany,
     ManyToOne,
     OneToMany,
@@ -33,4 +36,10 @@ export class Project {
 
     @OneToMany(() => UserProject, (userProject) => userProject.project)
     userProject: UserProject[];
+
+    @OneToMany(() => Timesheet, (timesheet) => timesheet.project)
+    timesheet: Timesheet[];
+
+    @ManyToMany(() => Task, (task) => task.projects)
+    tasks: Task[];
 }
