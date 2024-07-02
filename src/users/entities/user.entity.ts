@@ -1,6 +1,8 @@
 import { Exclude } from 'class-transformer';
+import { Client } from 'src/client/entities/client.entity';
 import { Branch } from 'src/constant/enum/branch.enum';
 import { Role } from 'src/constant/enum/role.enum';
+import { Timesheet } from 'src/timesheet/entities/timesheet.entity';
 import { UserProject } from 'src/user-project/entities/user-project.entity';
 import {
     Entity,
@@ -45,4 +47,10 @@ export class User {
 
     @OneToMany(() => UserProject, (userProject) => userProject.user)
     userProject: UserProject[];
+
+    @OneToMany(() => Timesheet, (timesheet) => timesheet.user)
+    timesheet: Timesheet[];
+
+    @OneToMany(() => Client, (client) => client.user)
+    client: Client[];
 }

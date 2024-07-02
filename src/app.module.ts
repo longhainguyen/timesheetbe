@@ -10,6 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { UserProjectModule } from './user-project/user-project.module';
 import { dataSourceOptions } from 'db/data-source';
+import { TaskModule } from './task/task.module';
+import { ClientModule } from './client/client.module';
+import { TimesheetModule } from './timesheet/timesheet.module';
 
 @Module({
     imports: [
@@ -22,6 +25,9 @@ import { dataSourceOptions } from 'db/data-source';
         AuthModule,
         ProjectModule,
         UserProjectModule,
+        TaskModule,
+        ClientModule,
+        TimesheetModule,
     ],
     controllers: [AppController],
     providers: [AppService],
