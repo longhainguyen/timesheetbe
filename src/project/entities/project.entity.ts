@@ -40,7 +40,6 @@ export class Project {
     @OneToMany(() => Timesheet, (timesheet) => timesheet.project)
     timesheet: Timesheet[];
 
-    @ManyToMany(() => Task)
-    @JoinTable({ name: 'project_task' })
+    @ManyToMany(() => Task, (task) => task.projects)
     tasks: Task[];
 }

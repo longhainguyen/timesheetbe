@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsIn, IsNotEmpty, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+    IsBoolean,
+    IsEmail,
+    IsIn,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    Length,
+    Matches,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
 import { Branch } from 'src/constant/enum/branch.enum';
 import { Role } from 'src/constant/enum/role.enum';
 
@@ -26,6 +37,7 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'The email is required' })
     email: string;
 
+    @ApiProperty()
     @IsIn([Role.ADMIN, Role.MANAGER, Role.STAFF, undefined], { message: 'Role must be either admin, staff or manager' })
     role: string;
 

@@ -23,6 +23,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from './roles.guard';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { ApiBasicAuth, ApiBearerAuth, ApiParam, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { Branch } from 'src/constant/enum/branch.enum';
 
 @Controller('users')
 @ApiBearerAuth('JWT-auth')
@@ -35,7 +36,6 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     // @Public()
-    @ApiQuery({ name: 'role', enum: Role })
     @Post()
     create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);

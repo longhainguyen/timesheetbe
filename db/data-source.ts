@@ -8,7 +8,7 @@ export const dataSourceOptions: DataSourceOptions = {
     username: process.env.DATABASE_USER || 'root',
     password: process.env.DATABASE_PASSWORD || '',
     database: process.env.DATABASE_NAME || 'timesheet',
-    entities: [join(process.cwd(), 'dist/**/*.entity.js')],
+    entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
 };
 

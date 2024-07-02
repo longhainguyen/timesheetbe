@@ -1,34 +1,76 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UseGuards,
+    ParseEnumPipe,
+    HttpException,
+    HttpStatus,
+    Query,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from 'src/users/roles.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/constant/enum/role.enum';
+import { ParseDataToIntPipe } from 'src/pipe/parse-int.pipe';
+import { Task } from './entities/task.entity';
+import { TypeTask } from 'src/constant/enum/task.enum';
 
+@ApiBearerAuth('JWT-auth')
+@ApiTags('task')
 @Controller('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+    constructor(private readonly taskService: TaskService) {}
 
-  @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
-  }
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN)
+    @Post()
+    async create(@Body() createTaskDto: CreateTaskDto) {
+        return await this.taskService.create(createTaskDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.taskService.findAll();
-  }
+    @Get()
+    async findAll() {
+        return await this.taskService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
-  }
+    @Get('/type')
+    async getTaskByType(@Query('type', new ParseEnumPipe(TypeTask)) type: TypeTask): Promise<Task[]> {
+        try {
+            return await this.taskService.getTaskByType(type);
+        } catch (error) {
+            throw new HttpException('Failed to retrieve tasks by type', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
-  }
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return await this.taskService.findOne(+id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
-  }
+    @Patch(':id')
+    async update(
+        @Param('id', new ParseDataToIntPipe()) id: number,
+        @Body() updateTaskDto: UpdateTaskDto,
+    ): Promise<Task> {
+        try {
+            return await this.taskService.update(id, updateTaskDto);
+        } catch (error) {
+            throw new HttpException('Failed to update task', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN)
+    @Delete(':id')
+    async remove(@Param('id', new ParseDataToIntPipe()) id: string) {
+        return await this.taskService.remove(+id);
+    }
 }
