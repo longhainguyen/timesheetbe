@@ -52,5 +52,5 @@ export class User {
     timesheet: Timesheet[];
 
     @OneToMany(() => Client, (client) => client.user)
-    client: Client[];
+    clients: Client[];
 }

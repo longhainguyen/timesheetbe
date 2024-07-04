@@ -6,6 +6,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/users/roles.guard';
 import { Role } from 'src/constant/enum/role.enum';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Unique } from 'typeorm';
 
 @ApiTags('project')
 @ApiBearerAuth('JWT-auth')
@@ -17,6 +18,6 @@ export class UserProjectController {
     @Roles(Role.ADMIN)
     @Post('add-user')
     async addUserToProject(@Body() addUserToProjectDto: AddUserToProjectDto) {
-        return this.userProjectService.addUserToProject(addUserToProjectDto);
+        return await this.userProjectService.addUserToProject(addUserToProjectDto);
     }
 }
