@@ -12,7 +12,10 @@ export class Timesheet {
     @Column({ nullable: false })
     workingTime: number;
 
-    @Column({ nullable: false, type: 'enum', enum: StatusTimeSheet })
+    @Column({ nullable: false })
+    description: string;
+
+    @Column({ type: 'enum', enum: StatusTimeSheet, default: StatusTimeSheet.NOTSUBMITTED })
     status: string;
 
     @ManyToOne(() => Project, (project) => project.timesheet)

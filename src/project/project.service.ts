@@ -19,34 +19,24 @@ export class ProjectService {
 
     async create(createProjectDto: CreateProjectDto): Promise<Project> {
         const newProject = this.projectsRepository.create(createProjectDto);
-        try {
-            const commonTasks = await this.taskRepository.find({
-                where: { type: TypeTask.COMMON },
-            });
-            newProject.tasks = commonTasks;
-            return await this.projectsRepository.save(newProject);
-        } catch (error) {
-            if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
-                throw new HttpException('Project with this name already exists', HttpStatus.CONFLICT);
-            }
-            throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        const commonTasks = await this.taskRepository.find({
+            where: { type: TypeTask.COMMON },
+        });
+        newProject.tasks = commonTasks;
+        return await this.projectsRepository.save(newProject);
     }
 
     async getProjectById(id: number): Promise<Project> {
-        try {
-            const project = await this.projectsRepository.findOne({
-                where: { id },
-                relations: ['tasks'],
-            });
+        const project = await this.projectsRepository.findOne({
+            where: { id },
+            relations: ['tasks'],
+        });
 
-            if (!project) {
-                throw new NotFoundException(`Project with ID ${id} not found`);
-            }
-
-            return project;
-        } catch (error) {
-            throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!project) {
+            throw new NotFoundException(`Project with ID ${id} not found`);
         }
+
+        return project;
     }
 }
