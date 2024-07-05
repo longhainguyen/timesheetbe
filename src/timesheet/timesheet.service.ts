@@ -11,7 +11,7 @@ import { StatusTimeSheet } from 'src/constant/enum/status.enum';
 import { classToPlain, instanceToPlain } from 'class-transformer';
 import { DateRangeDto } from './dto/date-range.dto';
 import { FindByDateDto } from './dto/day.dto';
-import { ProjectTaskValidatorService } from './timesheet.utils';
+import { TimesheetValidatorService } from './timesheet.utils';
 import { Request } from 'express';
 import { ApproveOrRejectDto } from './dto/approve-or-reject.dto';
 
@@ -30,7 +30,7 @@ export class TimesheetService {
         @InjectRepository(Task)
         private readonly taskRepository: Repository<Task>,
 
-        private readonly projectTaskValidatorService: ProjectTaskValidatorService,
+        private readonly timesheetValidatorService: TimesheetValidatorService,
     ) {}
 
     async create(@Req() request, createTimesheetDto: CreateTimesheetDto) {
@@ -40,7 +40,7 @@ export class TimesheetService {
 
         const task = await this.taskRepository.findOne({ where: { id: createTimesheetDto.taskId } });
 
-        await this.projectTaskValidatorService.validateProjectAndTask(
+        await this.timesheetValidatorService.validateProjectAndTask(
             createTimesheetDto.projectId,
             createTimesheetDto.taskId,
         );
@@ -58,6 +58,12 @@ export class TimesheetService {
         if (!project || !task || !user) {
             throw new NotFoundException('Project, User, or Task not found');
         }
+
+        await this.timesheetValidatorService.validateProjectAndUser(createTimesheetDto.projectId, request.user.sub);
+        await this.timesheetValidatorService.validateProjectAndTask(
+            createTimesheetDto.projectId,
+            createTimesheetDto.taskId,
+        );
 
         const timesheet = this.timesheetRepository.create({
             ...createTimesheetDto,
@@ -85,29 +91,25 @@ export class TimesheetService {
     }
 
     async findByDay(findByDateDto: FindByDateDto) {
-        try {
-            const { date } = findByDateDto;
+        const { date } = findByDateDto;
 
-            const startOfDay = new Date(date);
-            startOfDay.setUTCHours(0, 0, 0, 0);
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
 
-            const endOfDay = new Date(date);
-            endOfDay.setUTCHours(23, 59, 59, 999);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
 
-            const timesheets = await this.timesheetRepository.find({
-                where: {
-                    createAt: Between(startOfDay, endOfDay),
-                },
-                relations: ['project', 'user', 'task'],
-            });
+        const timesheets = await this.timesheetRepository.find({
+            where: {
+                createAt: Between(startOfDay, endOfDay),
+            },
+            relations: ['project', 'user', 'task'],
+        });
 
-            return timesheets.map((timesheet) => instanceToPlain(timesheet));
-        } catch (error) {
-            console.log(error);
-        }
+        return timesheets.map((timesheet) => instanceToPlain(timesheet));
     }
 
-    async update(id: number, updateTimesheetDto: UpdateTimesheetDto): Promise<any> {
+    async update(@Req() req, id: number, updateTimesheetDto: UpdateTimesheetDto): Promise<any> {
         const timesheet = await this.timesheetRepository.findOne({
             where: {
                 id: id,
@@ -120,7 +122,8 @@ export class TimesheetService {
         }
 
         if (updateTimesheetDto.projectId && !updateTimesheetDto.taskId) {
-            await this.projectTaskValidatorService.validateProjectAndTask(
+            await this.timesheetValidatorService.validateProjectAndUser(updateTimesheetDto.projectId, req.user.sub);
+            await this.timesheetValidatorService.validateProjectAndTask(
                 updateTimesheetDto.projectId,
                 timesheet.task.id,
             );
@@ -128,7 +131,7 @@ export class TimesheetService {
         }
 
         if (updateTimesheetDto.taskId && !updateTimesheetDto.projectId) {
-            await this.projectTaskValidatorService.validateProjectAndTask(
+            await this.timesheetValidatorService.validateProjectAndTask(
                 timesheet.project.id,
                 updateTimesheetDto.taskId,
             );
@@ -136,7 +139,8 @@ export class TimesheetService {
         }
 
         if (updateTimesheetDto.taskId && updateTimesheetDto.projectId) {
-            await this.projectTaskValidatorService.validateProjectAndTask(
+            await this.timesheetValidatorService.validateProjectAndUser(updateTimesheetDto.projectId, req.user.sub);
+            await this.timesheetValidatorService.validateProjectAndTask(
                 updateTimesheetDto.projectId,
                 updateTimesheetDto.taskId,
             );

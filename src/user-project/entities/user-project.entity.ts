@@ -7,10 +7,12 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
+@Unique(['user', 'project'])
 export class UserProject {
     @PrimaryGeneratedColumn()
     id: number;
