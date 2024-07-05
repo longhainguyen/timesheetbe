@@ -26,6 +26,6 @@ export class Client {
     @UpdateDateColumn({ type: 'timestamp', nullable: false })
     updateAt: Date;
 
-    @ManyToOne(() => User, (user) => user.client)
+    @ManyToOne(() => User, (user) => user.clients)
     user: User;
 }

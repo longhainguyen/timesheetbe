@@ -37,8 +37,8 @@ export class TimesheetController {
 
     @UseGuards(TimesheetOwnerGuard)
     @Patch(':id')
-    async update(@Param('id') id: string, @Body() updateTimesheetDto: UpdateTimesheetDto) {
-        return await this.timesheetService.update(+id, updateTimesheetDto);
+    async update(@Request() req, @Param('id') id: string, @Body() updateTimesheetDto: UpdateTimesheetDto) {
+        return await this.timesheetService.update(req, +id, updateTimesheetDto);
     }
 
     @Delete(':id')
