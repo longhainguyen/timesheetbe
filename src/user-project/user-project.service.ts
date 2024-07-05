@@ -51,4 +51,17 @@ export class UserProjectService {
 
         return plainToClass(UserProject, savedUserProject);
     }
+
+    async getPeopleInProject(idProject: number) {
+        const userInProject = await this.userProjectRepository.find({
+            where: {
+                project: {
+                    id: idProject,
+                },
+            },
+            relations: ['user'],
+        });
+
+        return userInProject.map((up) => up.user);
+    }
 }
