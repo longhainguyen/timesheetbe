@@ -13,6 +13,8 @@ import { dataSourceOptions } from 'db/data-source';
 import { TaskModule } from './task/task.module';
 import { ClientModule } from './client/client.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
+import { FileModule } from './file/file.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -28,6 +30,8 @@ import { TimesheetModule } from './timesheet/timesheet.module';
         TaskModule,
         ClientModule,
         TimesheetModule,
+        FileModule,
+        CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [AppService],
