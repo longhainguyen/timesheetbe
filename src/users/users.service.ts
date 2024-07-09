@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateRoleUserDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,12 +6,16 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
+import { UserImage } from './entities/user-avatar.entity';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly usersRepository: Repository<User>,
+
+        @InjectRepository(UserImage)
+        private readonly userImageRepository: Repository<UserImage>,
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
@@ -82,5 +86,53 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         return updatedUser;
+    }
+
+    async updateUserImage(@Req() request, imagePath: string): Promise<User> {
+        if (!request.user) {
+            throw new UnauthorizedException();
+        }
+
+        const user = await this.usersRepository.findOne({ where: { id: request.user.sub } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        let userImage = await this.userImageRepository.findOne({ where: { id: user.id } });
+        if (!userImage) {
+            userImage = new UserImage();
+        }
+
+        userImage.path = imagePath;
+        user.userImage = userImage;
+
+        await this.userImageRepository.save(userImage);
+        return this.usersRepository.save(user);
+    }
+
+    async getImage(@Req() request) {
+        if (!request.user) {
+            throw new UnauthorizedException();
+        }
+
+        const user = await this.usersRepository.findOne({
+            where: { id: request.user.sub },
+            relations: ['userImage'],
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user.userImage;
+    }
+
+    async getImageById(id: number) {
+        const user = await this.usersRepository.findOne({
+            where: { id: id },
+            relations: ['userImage'],
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user.userImage;
     }
 }

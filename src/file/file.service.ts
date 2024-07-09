@@ -5,11 +5,15 @@ import { Workbook } from 'exceljs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { UserImage } from 'src/users/entities/user-avatar.entity';
 
 @Injectable()
 export class FileService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>;
+
+    @InjectRepository(UserImage)
+    private readonly userImageRepository: Repository<UserImage>;
 
     async downloadExcel(data: User[]) {
         if (!data || data.length === 0) {
@@ -46,5 +50,9 @@ export class FileService {
         });
 
         return file;
+    }
+
+    async UploadAvatar() {
+        // this.userImageRepository
     }
 }

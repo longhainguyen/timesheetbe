@@ -28,6 +28,7 @@ import { UsersService } from 'src/users/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { multerConfig } from 'src/config/multer.config';
 
 @ApiTags('file')
 @Controller('file')
@@ -48,33 +49,19 @@ export class FileController {
         res.download(`${result}`);
     }
 
+    @Public()
     @Get()
     getFile(@Res() res: Response) {
-        const file = createReadStream(
-            join(process.cwd(), 'upload/My report-15768-L4MlwirRVcgJ-.xlsx-1720423611275_838445514.xlsx'),
-        );
+        const file = createReadStream(join(process.cwd(), 'upload/sam.jpg-1720433768144_21261130.jpg'));
+        // console.log(file);
         file.pipe(res);
     }
 
     @Public()
     @Post('upload-local')
-    @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination: './upload',
-                filename: (req, file, callback) => {
-                    const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1e9);
-                    const ext = extname(file.originalname);
-                    const filename = `${file.originalname}-${uniqueSuffix}${ext}`;
-                    callback(null, filename);
-                },
-            }),
-        }),
-    )
+    @UseInterceptors(FileInterceptor('file', multerConfig))
     uploadFile(@UploadedFile() file: Express.Multer.File) {
-        return {
-            message: 'Success',
-        };
+        return file.path;
     }
 
     @Public()
@@ -82,5 +69,13 @@ export class FileController {
     @UseInterceptors(FileInterceptor('file'))
     uploadImage(@UploadedFile() file: Express.Multer.File) {
         return this.cloudinaryService.uploadFile(file);
+    }
+
+    @Public()
+    @Post('upload-cloud')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+        const result = this.cloudinaryService.uploadFile(file);
+        return this.fileService.UploadAvatar();
     }
 }
