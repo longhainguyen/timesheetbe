@@ -13,9 +13,15 @@ import { dataSourceOptions } from 'db/data-source';
 import { TaskModule } from './task/task.module';
 import { ClientModule } from './client/client.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     imports: [
+        CacheModule.register({
+            ttl: 5, // seconds
+            max: 10, // maximum number of items in cache
+            isGlobal: true,
+        }),
         UsersModule,
         ConfigModule.forRoot({
             isGlobal: true,

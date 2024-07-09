@@ -19,6 +19,7 @@ import { RolesGuard } from 'src/users/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/constant/enum/role.enum';
 import { ParseDataToIntPipe } from 'src/pipe/parse-int.pipe';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('client')
 @UseGuards(RolesGuard)
@@ -34,6 +35,7 @@ export class ClientController {
     }
 
     @Get()
+    @UseInterceptors(CacheInterceptor)
     findAll() {
         return this.clientService.findAll();
     }
