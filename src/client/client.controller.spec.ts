@@ -3,18 +3,18 @@ import { ClientController } from './client.controller';
 import { ClientService } from './client.service';
 
 describe('ClientController', () => {
-  let controller: ClientController;
+    let controller: ClientController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [ClientController],
-      providers: [ClientService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [ClientController],
+            providers: [ClientService],
+        }).compile();
 
-    controller = module.get<ClientController>(ClientController);
-  });
+        controller = module.get<ClientController>(ClientController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });

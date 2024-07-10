@@ -3,18 +3,18 @@ import { TimesheetController } from './timesheet.controller';
 import { TimesheetService } from './timesheet.service';
 
 describe('TimesheetController', () => {
-  let controller: TimesheetController;
+    let controller: TimesheetController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [TimesheetController],
-      providers: [TimesheetService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [TimesheetController],
+            providers: [TimesheetService],
+        }).compile();
 
-    controller = module.get<TimesheetController>(TimesheetController);
-  });
+        controller = module.get<TimesheetController>(TimesheetController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });
