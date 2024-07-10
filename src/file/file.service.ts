@@ -51,8 +51,4 @@ export class FileService {
 
         return file;
     }
-
-    async UploadAvatar() {
-        // this.userImageRepository
-    }
 }
