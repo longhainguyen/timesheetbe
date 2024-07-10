@@ -6,12 +6,15 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly usersRepository: Repository<User>,
+
+        private readonly mailerService: MailerService,
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
@@ -82,5 +85,20 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         return updatedUser;
+    }
+
+    async sendWeeklyNotification(): Promise<void> {
+        const users = await this.usersRepository.find();
+
+        for (const user of users) {
+            await this.mailerService.sendMail({
+                to: user.email,
+                subject: 'Weekly Notification',
+                template: './weekly-notification',
+                context: {
+                    name: user.userName,
+                },
+            });
+        }
     }
 }

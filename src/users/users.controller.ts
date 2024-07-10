@@ -24,6 +24,7 @@ import { RolesGuard } from './roles.guard';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { ApiBasicAuth, ApiBearerAuth, ApiParam, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Branch } from 'src/constant/enum/branch.enum';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Controller('users')
 @ApiBearerAuth('JWT-auth')
@@ -76,5 +77,10 @@ export class UsersController {
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: string) {
         return this.usersService.remove(+id);
+    }
+
+    @Cron('0 31 13 * * *')
+    async handleCron() {
+        await this.usersService.sendWeeklyNotification();
     }
 }
