@@ -13,10 +13,14 @@ import { dataSourceOptions } from 'db/data-source';
 import { TaskModule } from './task/task.module';
 import { ClientModule } from './client/client.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { mailerConfig } from './config/mailer.config';
 
 @Module({
     imports: [
         UsersModule,
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configuration],
@@ -28,6 +32,7 @@ import { TimesheetModule } from './timesheet/timesheet.module';
         TaskModule,
         ClientModule,
         TimesheetModule,
+        MailerModule.forRootAsync(mailerConfig),
     ],
     controllers: [AppController],
     providers: [AppService],
