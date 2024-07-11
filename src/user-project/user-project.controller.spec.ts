@@ -3,18 +3,18 @@ import { UserProjectController } from './user-project.controller';
 import { UserProjectService } from './user-project.service';
 
 describe('UserProjectController', () => {
-  let controller: UserProjectController;
+    let controller: UserProjectController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [UserProjectController],
-      providers: [UserProjectService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [UserProjectController],
+            providers: [UserProjectService],
+        }).compile();
 
-    controller = module.get<UserProjectController>(UserProjectController);
-  });
+        controller = module.get<UserProjectController>(UserProjectController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });
