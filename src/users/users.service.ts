@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
+import { MailerService } from '@nestjs-modules/mailer';
 import { UserImage } from './entities/user-avatar.entity';
 
 @Injectable()
@@ -13,6 +14,8 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly usersRepository: Repository<User>,
+
+        private readonly mailerService: MailerService,
 
         @InjectRepository(UserImage)
         private readonly userImageRepository: Repository<UserImage>,
@@ -86,6 +89,21 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         return updatedUser;
+    }
+
+    async sendWeeklyNotification(): Promise<void> {
+        const users = await this.usersRepository.find();
+
+        for (const user of users) {
+            await this.mailerService.sendMail({
+                to: user.email,
+                subject: 'Weekly Notification',
+                template: './weekly-notification',
+                context: {
+                    name: user.userName,
+                },
+            });
+        }
     }
 
     async updateUserImage(@Req() request, imagePath: string): Promise<User> {

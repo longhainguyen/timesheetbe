@@ -8,4 +8,13 @@ export default () => ({
         type: process.env.DATABASE_TYPE,
     },
     secret: process.env.SECRET_KEY,
+
+    mailer: {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        user: process.env.MAILDEV_INCOMING_USER,
+        pass: process.env.MAILDEV_INCOMING_PASS,
+        sender: process.env.MAIL_SENDER,
+        service: process.env.MAIL_SERVICE,
+    },
 });
