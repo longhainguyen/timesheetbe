@@ -70,12 +70,4 @@ export class FileController {
     uploadImage(@UploadedFile() file: Express.Multer.File) {
         return this.cloudinaryService.uploadFile(file);
     }
-
-    @Public()
-    @Post('upload-cloud')
-    @UseInterceptors(FileInterceptor('file'))
-    uploadAvatar(@UploadedFile() file: Express.Multer.File) {
-        const result = this.cloudinaryService.uploadFile(file);
-        return this.fileService.UploadAvatar();
-    }
 }
