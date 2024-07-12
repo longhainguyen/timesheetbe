@@ -10,6 +10,7 @@ import {
     UseGuards,
     UseInterceptors,
     ClassSerializerInterceptor,
+    Inject,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -19,7 +20,8 @@ import { RolesGuard } from 'src/users/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/constant/enum/role.enum';
 import { ParseDataToIntPipe } from 'src/pipe/parse-int.pipe';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @ApiTags('client')
 @UseGuards(RolesGuard)
@@ -27,7 +29,10 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 @Controller('client')
 @UseInterceptors(ClassSerializerInterceptor)
 export class ClientController {
-    constructor(private readonly clientService: ClientService) {}
+    constructor(
+        private readonly clientService: ClientService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    ) {}
 
     @Post()
     async create(@Request() req, @Body() createClientDto: CreateClientDto) {
@@ -38,6 +43,17 @@ export class ClientController {
     @UseInterceptors(CacheInterceptor)
     findAll() {
         return this.clientService.findAll();
+    }
+
+    @Get('/test-cache/')
+    async demoGetCache() {
+        return await this.cacheManager.get('newnet');
+    }
+
+    @Post('/test-cache/')
+    async demoPstCache() {
+        await this.cacheManager.set('newnet', 'hello');
+        return true;
     }
 
     @Get(':id')

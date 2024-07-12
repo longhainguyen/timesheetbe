@@ -34,6 +34,7 @@ export class ClientService {
     }
 
     async findAll() {
+        console.log('here');
         return await this.clientRepository
             .createQueryBuilder('client')
             .leftJoinAndSelect('client.user', 'user')
