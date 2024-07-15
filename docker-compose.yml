@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+    nestjs_api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - '3000:3000'
+        environment:
+            - PORT=3000
+            - NODE_ENV=development
+            - DATABASE_USER=${DATABASE_USER}
+            - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+            - DATABASE_NAME=${DATABASE_NAME}
+            - DATABASE_HOST=${DATABASE_HOST}
+            - DATABASE_PORT=${DATABASE_PORT}
+            - DATABASE_TYPE=${DATABASE_TYPE}
+        volumes:
+            - ./src:/usr/src/app/src
+        depends_on:
+            - mysql_db
+
+    mysql_db:
+        image: mysql:latest
+        ports:
+            - '3307:3307'
+        environment:
+            - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+            - MYSQL_DATABASE=${DATABASE_NAME}
+            - MYSQL_USER=${DATABASE_USER}
+            - MYSQL_PASSWORD=${DATABASE_PASSWORD}
+            - MYSQL_TCP_PORT=${DATABASE_PORT}
