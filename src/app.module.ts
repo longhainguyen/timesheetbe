@@ -16,6 +16,8 @@ import { TimesheetModule } from './timesheet/timesheet.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerConfig } from './config/mailer.config';
+import { FileModule } from './file/file.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -33,6 +35,8 @@ import { mailerConfig } from './config/mailer.config';
         ClientModule,
         TimesheetModule,
         MailerModule.forRootAsync(mailerConfig),
+        FileModule,
+        CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [AppService],

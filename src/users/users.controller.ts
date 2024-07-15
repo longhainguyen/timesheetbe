@@ -10,6 +10,10 @@ import {
     UseGuards,
     UseInterceptors,
     ClassSerializerInterceptor,
+    UploadedFile,
+    Request,
+    StreamableFile,
+    Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,13 +29,20 @@ import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { ApiBasicAuth, ApiBearerAuth, ApiParam, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Branch } from 'src/constant/enum/branch.enum';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer.config';
+import { Response } from 'express';
+import { join } from 'path';
+import { createReadStream } from 'fs';
+import { Observable } from 'rxjs';
+import { request } from 'http';
 
 @Controller('users')
 @ApiBearerAuth('JWT-auth')
 @ApiTags('users')
 @UseGuards(RolesGuard)
 @Roles(Role.ADMIN)
-@UseInterceptors(LoggingInterceptor)
+// @UseInterceptors(LoggingInterceptor)
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
@@ -82,5 +93,27 @@ export class UsersController {
     @Cron('0 31 13 * * *')
     async handleCron() {
         await this.usersService.sendWeeklyNotification();
+    }
+
+    @Roles(Role.ADMIN, Role.MANAGER, Role.STAFF)
+    @Post('/upload-image')
+    @UseInterceptors(FileInterceptor('file', multerConfig))
+    async uploadFile(@Request() req: Request, @UploadedFile() file: Express.Multer.File) {
+        const path = file.path;
+        return this.usersService.updateUserImage(req, path);
+    }
+
+    @Roles(Role.ADMIN, Role.MANAGER, Role.STAFF)
+    @Get('/image/avatar')
+    async getImage(@Res() res: Response, @Request() request: Response) {
+        const userImage = await this.usersService.getImage(request);
+        return res.sendFile(join(process.cwd(), userImage.path));
+    }
+
+    @Roles(Role.ADMIN, Role.MANAGER, Role.STAFF)
+    @Get('/image/avatar/:id')
+    async getImageById(@Param(new ParseDataToIntPipe()) id: string, @Res() res: Response) {
+        const userImage = await this.usersService.getImageById(+id);
+        return res.sendFile(join(process.cwd(), userImage.path));
     }
 }
