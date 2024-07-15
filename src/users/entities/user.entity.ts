@@ -13,7 +13,10 @@ import {
     ManyToMany,
     JoinTable,
     OneToMany,
+    OneToOne,
+    JoinColumn,
 } from 'typeorm';
+import { UserImage } from './user-avatar.entity';
 
 @Entity()
 export class User {
@@ -53,4 +56,8 @@ export class User {
 
     @OneToMany(() => Client, (client) => client.user)
     clients: Client[];
+
+    @OneToOne(() => UserImage)
+    @JoinColumn()
+    userImage: UserImage;
 }
