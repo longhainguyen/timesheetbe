@@ -13,6 +13,11 @@ import { dataSourceOptions } from 'db/data-source';
 import { TaskModule } from './task/task.module';
 import { ClientModule } from './client/client.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { mailerConfig } from './config/mailer.config';
+import { FileModule } from './file/file.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
@@ -23,6 +28,7 @@ import { CacheModule } from '@nestjs/cache-manager';
             isGlobal: true,
         }),
         UsersModule,
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configuration],
@@ -34,6 +40,9 @@ import { CacheModule } from '@nestjs/cache-manager';
         TaskModule,
         ClientModule,
         TimesheetModule,
+        MailerModule.forRootAsync(mailerConfig),
+        FileModule,
+        CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [AppService],
