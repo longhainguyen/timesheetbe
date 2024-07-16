@@ -18,8 +18,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 @Module({
     imports: [
         CacheModule.register({
-            ttl: 5, // seconds
-            max: 10, // maximum number of items in cache
+            ttl: 60,
+            max: 100,
             isGlobal: true,
         }),
         UsersModule,

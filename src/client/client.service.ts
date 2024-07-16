@@ -6,6 +6,7 @@ import { Client } from './entities/client.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { instanceToPlain, plainToClass } from 'class-transformer';
+import { PaginationDto } from './dto/pagination-dto';
 
 @Injectable()
 export class ClientService {
@@ -33,13 +34,19 @@ export class ClientService {
         return instanceToPlain(saveClient);
     }
 
-    async findAll() {
-        console.log('here');
-        return await this.clientRepository
-            .createQueryBuilder('client')
-            .leftJoinAndSelect('client.user', 'user')
-            .select(['client', 'user'])
-            .getMany();
+    async findAll(paginationDto: PaginationDto) {
+        const { page = 1, limit = 10 } = paginationDto;
+        const [results, total] = await this.clientRepository.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return {
+            data: results,
+            count: total,
+            page,
+            limit,
+        };
     }
 
     async findOne(id: number) {
@@ -59,7 +66,7 @@ export class ClientService {
         return updatedClinet;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} client`;
+    async remove(id: number) {
+        return await this.clientRepository.delete(id);
     }
 }

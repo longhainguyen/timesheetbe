@@ -11,6 +11,7 @@ import {
     UseInterceptors,
     ClassSerializerInterceptor,
     Inject,
+    Query,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -22,6 +23,8 @@ import { Role } from 'src/constant/enum/role.enum';
 import { ParseDataToIntPipe } from 'src/pipe/parse-int.pipe';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CACHE_KEY_CLIENT } from 'src/constant/key-cache/key';
+import { PaginationDto } from './dto/pagination-dto';
 
 @ApiTags('client')
 @UseGuards(RolesGuard)
@@ -40,34 +43,38 @@ export class ClientController {
     }
 
     @Get()
-    @UseInterceptors(CacheInterceptor)
-    findAll() {
-        return this.clientService.findAll();
-    }
-
-    @Get('/test-cache/')
-    async demoGetCache() {
-        return await this.cacheManager.get('newnet');
-    }
-
-    @Post('/test-cache/')
-    async demoPstCache() {
-        await this.cacheManager.set('newnet', 'hello');
-        return true;
+    async findAll(@Query() paginationDto: PaginationDto) {
+        return await this.clientService.findAll(paginationDto);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.clientService.findOne(+id);
+    async findOne(@Param('id') id: string) {
+        const cacheKey = `${CACHE_KEY_CLIENT}${id}`;
+        const cachedData = await this.cacheManager.get(cacheKey);
+
+        if (cachedData) {
+            return cachedData;
+        }
+        const client = await this.clientService.findOne(+id);
+        await this.cacheManager.set(cacheKey, client, { ttl: 300 });
+
+        return client;
     }
 
     @Patch(':id')
-    update(@Param('id', new ParseDataToIntPipe()) id: string, @Body() updateClientDto: UpdateClientDto) {
-        return this.clientService.update(+id, updateClientDto);
+    async update(@Param('id', new ParseDataToIntPipe()) id: string, @Body() updateClientDto: UpdateClientDto) {
+        const updatedClient = await this.clientService.update(+id, updateClientDto);
+        const cacheKey = `${CACHE_KEY_CLIENT}${id}`;
+        await this.cacheManager.del(cacheKey);
+        await this.cacheManager.set(cacheKey, updatedClient, { ttl: 300 });
+
+        return updatedClient;
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.clientService.remove(+id);
+    async remove(@Param('id') id: string) {
+        const cacheKey = `${CACHE_KEY_CLIENT}${id}`;
+        await this.cacheManager.del(cacheKey);
+        return await this.clientService.remove(+id);
     }
 }
