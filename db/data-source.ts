@@ -1,16 +1,29 @@
-import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 
-export const dataSourceOptions: DataSourceOptions = {
-    type: 'mysql',
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: +process.env.DATABASE_PORT || 3306,
-    username: process.env.DATABASE_USER || 'root',
-    password: process.env.DATABASE_PASSWORD || '',
-    database: process.env.DATABASE_NAME || 'timesheet',
-    entities: ['dist/**/*.entity.js'],
-    migrations: ['dist/db/migrations/*.js'],
+@Injectable()
+export class DatabaseConfigService {
+    constructor(private configService: ConfigService) {}
+
+    getDataSourceOptions(): DataSourceOptions {
+        return {
+            type: 'mysql',
+            host: this.configService.get('database.host'),
+            port: this.configService.get('database.port'),
+            username: this.configService.get('database.username'),
+            password: this.configService.get('database.password'),
+            database: this.configService.get('database.name'),
+            entities: ['dist/**/*.entity.js'],
+            migrations: ['dist/db/migrations/*.js'],
+        };
+    }
+}
+
+const dataSourceFactory = async (configService: ConfigService): Promise<DataSource> => {
+    const databaseConfigService = new DatabaseConfigService(configService);
+    const options = databaseConfigService.getDataSourceOptions();
+    return new DataSource(options);
 };
 
-const dataSource = new DataSource(dataSourceOptions);
-export default dataSource;
+export default dataSourceFactory;
