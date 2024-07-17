@@ -1,29 +1,21 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { config } from 'dotenv';
 
-@Injectable()
-export class DatabaseConfigService {
-    constructor(private configService: ConfigService) {}
+config();
 
-    getDataSourceOptions(): DataSourceOptions {
-        return {
-            type: 'mysql',
-            host: this.configService.get('database.host'),
-            port: this.configService.get('database.port'),
-            username: this.configService.get('database.username'),
-            password: this.configService.get('database.password'),
-            database: this.configService.get('database.name'),
-            entities: ['dist/**/*.entity.js'],
-            migrations: ['dist/db/migrations/*.js'],
-        };
-    }
-}
+const configService = new ConfigService();
 
-const dataSourceFactory = async (configService: ConfigService): Promise<DataSource> => {
-    const databaseConfigService = new DatabaseConfigService(configService);
-    const options = databaseConfigService.getDataSourceOptions();
-    return new DataSource(options);
+export const dataSourceOptions: DataSourceOptions = {
+    type: 'mysql',
+    host: configService.getOrThrow('DATABASE_HOST'),
+    port: configService.getOrThrow('DATABASE_PORT'),
+    username: configService.getOrThrow('DATABASE_USER'),
+    password: configService.getOrThrow('DATABASE_PASSWORD'),
+    database: configService.getOrThrow('DATABASE_NAME'),
+    entities: ['dist/**/*.entity.js'],
+    migrations: ['dist/db/migrations/*.js'],
 };
 
-export default dataSourceFactory;
+const dataSource = new DataSource(dataSourceOptions);
+export default dataSource;

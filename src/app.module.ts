@@ -9,7 +9,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { UserProjectModule } from './user-project/user-project.module';
-import dataSourceFactory, { DatabaseConfigService } from 'db/data-source';
+import { dataSourceOptions } from 'db/data-source';
 import { TaskModule } from './task/task.module';
 import { ClientModule } from './client/client.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
@@ -27,14 +27,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
             isGlobal: true,
             load: [configuration],
         }),
-        TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => {
-                const dataSource = await dataSourceFactory(configService);
-                return dataSource.options;
-            },
-            inject: [ConfigService],
-        }),
+        TypeOrmModule.forRoot(dataSourceOptions),
         AuthModule,
         ProjectModule,
         UserProjectModule,
