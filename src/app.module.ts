@@ -18,9 +18,15 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { mailerConfig } from './config/mailer.config';
 import { FileModule } from './file/file.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     imports: [
+        CacheModule.register({
+            ttl: 60,
+            max: 100,
+            isGlobal: true,
+        }),
         UsersModule,
         ScheduleModule.forRoot(),
         ConfigModule.forRoot({
