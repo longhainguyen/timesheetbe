@@ -59,3 +59,6 @@ learn
 
 db/password.txt
 .vercel
+
+upload
+run/secrets*
